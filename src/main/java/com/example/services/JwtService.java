@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import javax.crypto.SecretKey;
+
 import org.hibernate.annotations.Comment;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -54,14 +56,16 @@ public class JwtService {
 
 	private String createToken(Map<String, Object> claims, String userName) {
 		// TODO Auto-generated method stub
-		return Jwts.builder().setClaims(claims).setSubject(userName).setIssuedAt(new Date(System.currentTimeMillis()))
+		String compact = Jwts.builder().setClaims(claims).setSubject(userName).setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
 				.signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
+		return compact;
 
 	}
 
 	private Key getSignKey() {
 		byte[] keyBytes = Decoders.BASE64.decode("67566B59703373367638792F423F4528482B4D6251655468576D5A7134743777");
-		return Keys.hmacShaKeyFor(keyBytes);
+		SecretKey key = Keys.hmacShaKeyFor(keyBytes);
+		return key;
 	}
 }
